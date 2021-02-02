@@ -1,0 +1,104 @@
+*{
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+:root{
+    --primary-color: white;
+    --secondary-color: black;
+    --accent-color: aqua;
+}
+
+body{
+    background: var(--primary-color);
+    color: var(--secondary-color);
+    /* background: linear-gradient(to right bottom, var(--primary-color), var(--secondary-color)); */
+    margin: 0px;
+    padding: 0px;
+    font-size: 2.0em;
+}
+
+.heading {
+    background-color: var(--secondary-color);
+    color: var(--primary-color)
+}
+
+/* NAV */
+nav{
+    display: block;
+    font-size: 1.2em;
+}
+
+nav ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-size: 1.33em;
+}
+nav ul p{
+    float: left;
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+nav ul li{
+    float: right;
+}
+nav ul li a{
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+/* NAV */
+
+/* BANNER */
+.heroimage{
+    background-size: cover;
+    height: 100vh;
+}
+
+.heroitems{
+    position: relative;
+    min-height: 550px;
+    height: 100vh;
+    text-align: left !important;
+    display: table-cell;
+    vertical-align: middle;
+    margin: auto;
+    z-index: 2;
+}
+
+.heroitems h1{
+    font-size: 7em;
+}
+
+.heroitems p{
+    font-size: 5em;
+}
+
+/* Particles */
+#particles-js{
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+}
+
+img{
+    content: "";
+    width: 100%;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+li {
+    list-style-type: none;
+}
