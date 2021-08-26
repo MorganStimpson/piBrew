@@ -21,6 +21,8 @@ from time import sleep, time
 import signal # this is for signaling to store all when ctrl c is typed
 import sqlite3
 import pandas as pd
+import os
+from os import path
 
 # ======================= SENSORS ========================================
 
@@ -39,6 +41,7 @@ def ReadFromSensors():
 # This is the sensor section.
 # I can not quiet read from these yet as I do not have a raspberry Pi to work with
 
+# https://medium.com/initial-state/how-to-build-a-raspberry-pi-temperature-monitor-8c2f70acaea9
 def pullTempReading():
     temp = 0
     return temp
@@ -135,20 +138,26 @@ def RepeatFunction(connection, beerStyle, brewDate):
 def main():
     print("Howdy, first we are going to set up the data base for you boss.")
     print("One second please.")
+
     
-    # TODO: connect to db and not fail if it is already there
-    # need to connect here and created the table
-    # if it does not occur here it will be repeated so it's best not to repeat that step
     connection = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
-    # https://stackoverflow.com/questions/11712342/inserting-a-variable-to-the-database-using-sqlite-in-python
-    connection.execute ('''CREATE TABLE FERMENTATION
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    print(cursor.fetchall())
+
+    if(cursor.fetchall() == ()):
+        print("Making table!")
+
+        connection.execute ('''CREATE TABLE FERMENTATION
                 (   STYLE           STR,
-                    DATEBREWED      STR,
-                    TIME            TIME PRIMARY KEY     NOT NULL,
-                    TEMPERATURE     INT,
-                    O2              INT,
-                    CO2             INT,
-                    PH              INT);''')
+                DATEBREWED      STR,
+                TIME            TIME PRIMARY KEY     NOT NULL,
+                TEMPERATURE     INT,
+                O2              INT,
+                CO2             INT,
+                PH              INT);''')
+
+    
 
     print("Connected to database correctly.")
 
@@ -164,8 +173,8 @@ def main():
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
     print("Thank you. Begining study.")
 
-    # WriteToDB(connection, beerStyle, brewDate)
-    # sleep(60)
+    WriteToDB(connection, beerStyle, brewDate)
+    sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
     # sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
@@ -173,18 +182,18 @@ def main():
 
     # This is used to see what is up there. RAAAD
 
-    # cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
     
-    # for row in cursor:
-    #    print ("STYLE = ", row[0])
-    #    print ("DATEBREWED = ", row[1])
-    #    print ("TIME = ", row[2])
-    #    print ("TEMPERATURE = ", row[3])
-    #    print ("O2 = ", row[4])
-    #    print ("CO2 = ", row[5]) 
-    #    print ("PH = ", row[6], "\n")
+    for row in cursor:
+       print ("STYLE = ", row[0])
+       print ("DATEBREWED = ", row[1])
+       print ("TIME = ", row[2])
+       print ("TEMPERATURE = ", row[3])
+       print ("O2 = ", row[4])
+       print ("CO2 = ", row[5]) 
+       print ("PH = ", row[6], "\n")
 
-    RepeatFunction(connection, beerStyle, brewDate)
+    #RepeatFunction(connection, beerStyle, brewDate)
 
     # When function is ended I want all to save and look back at it
     connection.close() # don't forget to close the db when you're finsihed
