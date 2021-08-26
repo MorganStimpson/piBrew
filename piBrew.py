@@ -1,7 +1,18 @@
 # Morgan Stimpson (morgan.stimpson@hotmail.com)
-# 
-# piBrew
-# This is intended to study and monitor the fermentation rate of beer currently brewing.
+# piBrew 
+##################################################################
+#
+#                        ######                       
+#               #####  # #     # #####  ###### #    # 
+#               #    # # #     # #    # #      #    # 
+#               #    # # ######  #    # #####  #    # 
+#               #####  # #     # #####  #      # ## # 
+#               #      # #     # #   #  #      ##  ## 
+#               #      # ######  #    # ###### #    # 
+#
+##################################################################
+
+# This is intended to study and monitor the fermentation rate of wort
 
 #import section
 from datetime import datetime
@@ -25,7 +36,6 @@ def ReadFromSensors():
 
     return temperature, o2, co2, ph
 
-
 # This is the sensor section.
 # I can not quiet read from these yet as I do not have a raspberry Pi to work with
 
@@ -34,71 +44,68 @@ def pullTempReading():
     return temp
 
 def pullO2Reading():
-    o2 = 0
+    o2 = 1
     return o2
 
 def pullCO2Reading():
-    co2 = 0
+    co2 = 2
     return co2
 
 def pullPHReading():
-    ph = 0
+    ph = 3
     return ph
-
 
 # Connect To Sensors
 def ConnectToSensors():
+    print("")
     print("FOOL OF A TOOK!")
     print("This has not been set up yet.")
 
-    if(1 == 2):            # if unable to connect return -1 for a failure.
+    if(1 != 2):            # if unable to connect return -1 for a failure.
         return -1
     return 0
 
 # ==========================================================================
 
 
+
 # Write To DataBase
 # - Write to a sql database 
 # - fields include time, temp, o2, co2, ph, having a herculomitor reading would be rad to
-def WriteToDB(connection):
+def WriteToDB(connection, beerStyle, brewDate):
 
     temperature, o2, co2, ph = ReadFromSensors()
 
+    print("")
     print("- Sucessfully read from sensors.")
     print("- trying to write")
 
     now = datetime.now()
     currentTime = now.strftime("%H:%M:%S") 
-    
-    # https://stackoverflow.com/questions/11712342/inserting-a-variable-to-the-database-using-sqlite-in-python
-    connection.execute ('''CREATE TABLE FERMENTATION
-                (TIME           TIME PRIMARY KEY     NOT NULL,
-                 TEMPERATURE    INT,
-                 O2             INT,
-                 CO2            INT,
-                 PH             INT);''')
 
     sql =       """
                 INSERT INTO FERMENTATION
-                (TIME, TEMPERATURE, O2, CO2, PH) \
-                VALUES (?, ?, ?, ?, ?)
+                (STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH) \
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """
 
     # this is what allows us to use the values.
     # now going to insert variables in there and make params a tuple
     
-    params = (currentTime, temperature, o2, co2, ph)
+    params = (beerStyle, brewDate, currentTime, temperature, o2, co2, ph)
     connection.execute (sql, params)
     connection.commit ()
     
     print("- Written to database")
 
 
+
 # Repeat Function -- come up with a better name
 # this function is what will be running once everything is started up.
 # this will constantly but every 15 minutes it will kick in to write.
-def RepeatFunction(connection):
+def RepeatFunction(connection, beerStyle, brewDate):
+    print("")
+    print("Starting data collection") 
 
     condition = False
 
@@ -107,49 +114,77 @@ def RepeatFunction(connection):
         sleep(60) # this is in seconds, it will attempt to write every 1 minutes.
     
     def timer():
+        print("")
         print("We are up and running")
-        WriteToDB(connection)
+        WriteToDB(connection, beerStyle, brewDate)
         # this is necessary since it will run in a near infinite loop and will crash. --stackoverflow error
-        print("now sleeping")
+        print("-Now sleeping")
         sleep(61)  # going to lean on the edge of 61 so we have no chance of calling 2 times inside of the same minute
-        print("now going to repeat")
-        RepeatFunction(connection)
-
-    # cursor = con.execute("SELECT TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
-    # 
-    # for row in cursor:
-    #    print ("TIME = ", row[0])
-    #    print ("TEMPERATURE = ", row[1])
-    #    print ("O2 = ", row[2])
-    #    print ("CO2 = ", row[3]) 
-    #    print ("PH = ", row[4], "\n")
+        print("-Now going to repeat")
+        RepeatFunction(connection, beerStyle, brewDate)
 
     timer()
 
 
 
 # Main
-# this is the central operator of the entire function
+# this is the central operator of the entire program
 # [] need to connect to the database then close
 # [] need to run the timing service
+# [] need to pull data correctly
 def main():
     print("Howdy, first we are going to set up the data base for you boss.")
     print("One second please.")
     
+    # TODO: connect to db and not fail if it is already there
+    # need to connect here and created the table
+    # if it does not occur here it will be repeated so it's best not to repeat that step
     connection = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
+    # https://stackoverflow.com/questions/11712342/inserting-a-variable-to-the-database-using-sqlite-in-python
+    connection.execute ('''CREATE TABLE FERMENTATION
+                (   STYLE           STR,
+                    DATEBREWED      STR,
+                    TIME            TIME PRIMARY KEY     NOT NULL,
+                    TEMPERATURE     INT,
+                    O2              INT,
+                    CO2             INT,
+                    PH              INT);''')
+
     print("Connected to database correctly.")
 
-
+    # TODO: Take in user input to reattempt
     if(ConnectToSensors() == -1):
         print("Sensors failed to connect.")
         print("Would you like to retry?")
     else:
         print("Sensors are connected correctly")
 
+    # user input section
+    beerStyle = input("Enter the style of your beer: ") 
+    brewDate  = input("Please enter date of brew in the format of --.--.---- ")
+    print("Thank you. Begining study.")
 
-    print("starting data collection")
+    # WriteToDB(connection, beerStyle, brewDate)
+    # sleep(60)
+    # WriteToDB(connection, beerStyle, brewDate)
+    # sleep(60)
+    # WriteToDB(connection, beerStyle, brewDate)
 
-    RepeatFunction(connection)
+
+    # This is used to see what is up there. RAAAD
+
+    # cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    
+    # for row in cursor:
+    #    print ("STYLE = ", row[0])
+    #    print ("DATEBREWED = ", row[1])
+    #    print ("TIME = ", row[2])
+    #    print ("TEMPERATURE = ", row[3])
+    #    print ("O2 = ", row[4])
+    #    print ("CO2 = ", row[5]) 
+    #    print ("PH = ", row[6], "\n")
+
+    RepeatFunction(connection, beerStyle, brewDate)
 
     # When function is ended I want all to save and look back at it
     connection.close() # don't forget to close the db when you're finsihed
