@@ -7,6 +7,7 @@
 from datetime import datetime
 from time import sleep, time
 
+import signal # this is for signaling to store all when ctrl c is typed
 import sqlite3
 import pandas as pd
 
@@ -24,31 +25,51 @@ def ReadFromSensors():
     
     print("-- connecting to sensors.")
 
+    temperature = 1
+    o2          = 2
+    co2         = 3
+    ph          = 4
+
+    return temperature, o2, co2, ph
+
 # WriteToDB
 # Write to a sql database 
 # fields include time, temp, o2, co2, ph, having a herculomitor reading would be rad to
-def WriteToDB(con):
+def WriteToDB(connection):
 
-    ReadFromSensors()
+    temperature, o2, co2, ph = ReadFromSensors()
+
+    print("- Sucessfully read from sensors.")
 
     now = datetime.now()
     currentTime = now.strftime("%H:%M:%S") 
-    valuesToInsert = (currentTime, 0, 1, 2, 3)
+    # valuesToInsert = (currentTime, 0, 1, 2, 3)
+# 
+    # # https://stackoverflow.com/questions/11712342/inserting-a-variable-to-the-database-using-sqlite-in-python
+    # # need to figure out the way to send variables in. -- tuple?
+    
+    # TODO: 1 allow insertion of multiple variable pieces.
 
-    # https://stackoverflow.com/questions/11712342/inserting-a-variable-to-the-database-using-sqlite-in-python
-    # need to figure out the way to send variables in. -- tuple?
-    con.execute ("INSERT INTO FERMENTATION (TIME, TEMPERATURE, O2, CO2, PH) \
-                VALUES ()", valuesToInsert)
-    con.commit ()
+    connection.execute ('''CREATE TABLE FERMENTATION
+                (TIME           TIME PRIMARY KEY     NOT NULL,
+                 TEMPERATURE    INT,
+                 O2             INT,
+                 CO2            INT,
+                 PH             INT);''')
 
-    # cursor = con.execute("SELECT TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
-    # for row in cursor:
-    #    print ("TIME = ", row[0])
-    #    print ("TEMPERATURE = ", row[1])
-    #    print ("O2 = ", row[2])
-    #    print ("CO2 = ", row[3]) 
-    #    print ("PH = ", row[4], "\n")
+    sql =       """
+                INSERT INTO FERMENTATION
+                (TIME, TEMPERATURE, O2, CO2, PH) \
+                VALUES (?, ?, ?, ?, ?)
+                """
 
+    # this is what allows us to use the values.
+    # now going to insert variables in there and make params a tuple
+    
+    params = (currentTime, temperature, o2, co2, ph)
+    
+    connection.execute (sql, params)
+    connection.commit ()
     
     print("- trying to write")
     print("- Current Time =", currentTime)
@@ -58,20 +79,21 @@ def WriteToDB(con):
 # Repeat Function -- come up with a better name
 # this function is what will be running once everything is started up.
 # this will constantly but every 15 minutes it will kick in to write.
-def RepeatFunction(con):
+def RepeatFunction(connection):
 
     condition = False
 
-    while datetime.now().minute not in {0, 15, 30, 45}: 
-        print("waiting 15 minutes before we write")
+    while datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}: 
+        print("waiting until a multiple of 5 before we write")
         sleep(60) # this is in seconds, it will attempt to write every 1 minutes.
     
     def timer():
         print("We are up and running")
-        WriteToDB(con)
+        WriteToDB(connection)
         # this is necessary since it will run in a near infinite loop and will crash. --stackoverflow error
-        sleep(60) 
-        RepeatFunction()
+        sleep(61)  # going to lean on the edge of 65 so we have no chance of calling 2 times inside of the same minute
+        
+        RepeatFunction(connection)
 
     timer()
 
@@ -87,21 +109,11 @@ def main():
     
     # HECK YEAH DUDE IT'S GOING GOOD
 
-    con = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
-    print("Connected to server correctly")
+    connection = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
+    print("Connected to database correctly")
 
-    con.execute ('''CREATE TABLE FERMENTATION
-                (TIME           TIME PRIMARY KEY     NOT NULL,
-                 TEMPERATURE    INT,
-                 O2             INT,
-                 CO2            INT,
-                 PH             INT);''')
-
-    # con.execute ("INSERT INTO FERMENTATION (TIME, TEMPERATURE, O2, CO2, PH) \
-    #   VALUES (0, 0, 0, 0, 0)")
-    # con.commit ()
-    # 
     # cursor = con.execute("SELECT TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    # 
     # for row in cursor:
     #    print ("TIME = ", row[0])
     #    print ("TEMPERATURE = ", row[1])
@@ -122,11 +134,11 @@ def main():
 
     print("starting data collection")
 
-    RepeatFunction(con)
+    RepeatFunction(connection)
 
     # When function is ended I want all to save and look back at it
 
-    con.close() # don't forget to close the db when you're finsihed
+    connection.close() # don't forget to close the db when you're finsihed
 
 
 if __name__ == '__main__':
