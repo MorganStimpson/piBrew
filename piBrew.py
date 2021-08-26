@@ -11,45 +11,67 @@ import signal # this is for signaling to store all when ctrl c is typed
 import sqlite3
 import pandas as pd
 
-# Connect To Sensors
-def ConnectToSensors():
-    print("bah")
-
-    if(1 == 2):            # if unable to connect return -1 for a failure.
-        return -1
-
-    return 0
+# ======================= SENSORS ========================================
 
 # ReadFromSensors
 def ReadFromSensors():
     
-    print("-- connecting to sensors.")
+    print("-- pulling data from sensors.")
 
-    temperature = 1
-    o2          = 2
-    co2         = 3
-    ph          = 4
+    temperature = pullTempReading()
+    o2          = pullO2Reading()
+    co2         = pullCO2Reading()
+    ph          = pullPHReading()
 
     return temperature, o2, co2, ph
 
-# WriteToDB
-# Write to a sql database 
-# fields include time, temp, o2, co2, ph, having a herculomitor reading would be rad to
+
+# This is the sensor section.
+# I can not quiet read from these yet as I do not have a raspberry Pi to work with
+
+def pullTempReading():
+    temp = 0
+    return temp
+
+def pullO2Reading():
+    o2 = 0
+    return o2
+
+def pullCO2Reading():
+    co2 = 0
+    return co2
+
+def pullPHReading():
+    ph = 0
+    return ph
+
+
+# Connect To Sensors
+def ConnectToSensors():
+    print("FOOL OF A TOOK!")
+    print("This has not been set up yet.")
+
+    if(1 == 2):            # if unable to connect return -1 for a failure.
+        return -1
+    return 0
+
+# ==========================================================================
+
+
+# Write To DataBase
+# - Write to a sql database 
+# - fields include time, temp, o2, co2, ph, having a herculomitor reading would be rad to
 def WriteToDB(connection):
 
     temperature, o2, co2, ph = ReadFromSensors()
 
     print("- Sucessfully read from sensors.")
+    print("- trying to write")
 
     now = datetime.now()
     currentTime = now.strftime("%H:%M:%S") 
-    # valuesToInsert = (currentTime, 0, 1, 2, 3)
-# 
-    # # https://stackoverflow.com/questions/11712342/inserting-a-variable-to-the-database-using-sqlite-in-python
-    # # need to figure out the way to send variables in. -- tuple?
     
-    # TODO: 1 allow insertion of multiple variable pieces.
-
+    # https://stackoverflow.com/questions/11712342/inserting-a-variable-to-the-database-using-sqlite-in-python
     connection.execute ('''CREATE TABLE FERMENTATION
                 (TIME           TIME PRIMARY KEY     NOT NULL,
                  TEMPERATURE    INT,
@@ -67,13 +89,10 @@ def WriteToDB(connection):
     # now going to insert variables in there and make params a tuple
     
     params = (currentTime, temperature, o2, co2, ph)
-    
     connection.execute (sql, params)
     connection.commit ()
     
-    print("- trying to write")
-    print("- Current Time =", currentTime)
-    print("- written")
+    print("- Written to database")
 
 
 # Repeat Function -- come up with a better name
@@ -91,26 +110,10 @@ def RepeatFunction(connection):
         print("We are up and running")
         WriteToDB(connection)
         # this is necessary since it will run in a near infinite loop and will crash. --stackoverflow error
-        sleep(61)  # going to lean on the edge of 65 so we have no chance of calling 2 times inside of the same minute
-        
+        print("now sleeping")
+        sleep(61)  # going to lean on the edge of 61 so we have no chance of calling 2 times inside of the same minute
+        print("now going to repeat")
         RepeatFunction(connection)
-
-    timer()
-
-
-
-# Main
-# this is the central operator of the entire function
-# [] need to connect to the database then close
-# [] need to run the timing service
-def main():
-    print("howdy, first we are going to set up the data base.")
-    print("one second please.")
-    
-    # HECK YEAH DUDE IT'S GOING GOOD
-
-    connection = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
-    print("Connected to database correctly")
 
     # cursor = con.execute("SELECT TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
     # 
@@ -121,9 +124,21 @@ def main():
     #    print ("CO2 = ", row[3]) 
     #    print ("PH = ", row[4], "\n")
 
-    # data = pd.write           # ooop don't know what to do with this.
+    timer()
 
-    # DB IS WORKING!
+
+
+# Main
+# this is the central operator of the entire function
+# [] need to connect to the database then close
+# [] need to run the timing service
+def main():
+    print("Howdy, first we are going to set up the data base for you boss.")
+    print("One second please.")
+    
+    connection = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
+    print("Connected to database correctly.")
+
 
     if(ConnectToSensors() == -1):
         print("Sensors failed to connect.")
@@ -137,7 +152,6 @@ def main():
     RepeatFunction(connection)
 
     # When function is ended I want all to save and look back at it
-
     connection.close() # don't forget to close the db when you're finsihed
 
 
