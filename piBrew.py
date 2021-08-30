@@ -17,6 +17,7 @@
 #import section
 from datetime import datetime
 from time import sleep
+import RPi.GPIO as GPIO
 
 import sqlite3
 #import pandas as pd
@@ -24,6 +25,7 @@ import sqlite3
 # ======================= SENSORS ========================================
 
 # Read From Sensors
+# Here we pull the data from the sensors
 def ReadFromSensors():
     
     print("-- pulling data from sensors.")
@@ -56,11 +58,13 @@ def pullPHReading():
     return ph
 
 # Connect To Sensors
+# If we are unable to connect to the sensors then return -1
+#  If we are able to connect return 0
 def ConnectToSensors():
     print("")
     print("This has not been set up yet.")
 
-    if(1 != 2):            # if unable to connect return -1 for a failure.
+    if(1 != 2):
         return -1
     return 0
 
@@ -70,7 +74,8 @@ def ConnectToSensors():
 
 # Write To DataBase
 # - Write to a sql database 
-# - fields include time, temp, o2, co2, ph, having a herculomitor reading would be rad to
+# - fields include style, datebrewed, time, temp, o2, co2, ph, 
+#   having a herculomitor reading would be rad to
 def WriteToDB(connection, beerStyle, brewDate):
 
     temperature, o2, co2, ph = ReadFromSensors()
@@ -88,9 +93,6 @@ def WriteToDB(connection, beerStyle, brewDate):
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """
 
-    # this is what allows us to use the values.
-    # now going to insert variables in there and make params a tuple
-    
     params = (beerStyle, brewDate, currentTime, temperature, o2, co2, ph)
     connection.execute (sql, params)
     connection.commit ()
@@ -101,23 +103,23 @@ def WriteToDB(connection, beerStyle, brewDate):
 
 # Repeat Function -- come up with a better name
 # this function is what will be running once everything is started up.
-# this will constantly but every 15 minutes it will kick in to write.
+# this will constantly but every 5 minutes it will kick in to write.
+# Once it is ran it will sleep for 1 minute and 1 second 
+#    so that it does not write 2 times on the same minute
 def RepeatFunction(connection, beerStyle, brewDate):
     print("")
     print("Starting data collection") 
 
-
     while( datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}): 
         print("waiting until a multiple of 5 before we write")
-        sleep(60) # this is in seconds, it will attempt to write every 1 minutes.
+        sleep(60)
     
     def timer():
         print("")
         print("We are up and running")
         WriteToDB(connection, beerStyle, brewDate)
-        # this is necessary since it will run in a near infinite loop and will crash. --stackoverflow error
         print("-Now sleeping")
-        sleep(61)  # going to lean on the edge of 61 so we have no chance of calling 2 times inside of the same minute
+        sleep(61)
         print("-Now going to repeat")
         RepeatFunction(connection, beerStyle, brewDate)
 
@@ -159,7 +161,7 @@ def main():
     # TODO: Take in user input to reattempt
     if(ConnectToSensors() == -1):
         print("Sensors failed to connect.")
-        print("Would you like to retry?")
+        print("You should restart the program.")
     else:
         print("Sensors are connected correctly")
 
