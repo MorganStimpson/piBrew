@@ -16,17 +16,14 @@
 
 #import section
 from datetime import datetime
-from time import sleep, time
+from time import sleep
 
-import signal # this is for signaling to store all when ctrl c is typed
 import sqlite3
 import pandas as pd
-import os
-from os import path
 
 # ======================= SENSORS ========================================
 
-# ReadFromSensors
+# Read From Sensors
 def ReadFromSensors():
     
     print("-- pulling data from sensors.")
@@ -110,9 +107,8 @@ def RepeatFunction(connection, beerStyle, brewDate):
     print("")
     print("Starting data collection") 
 
-    condition = False
 
-    while datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}: 
+    while( datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}): 
         print("waiting until a multiple of 5 before we write")
         sleep(60) # this is in seconds, it will attempt to write every 1 minutes.
     
@@ -132,9 +128,9 @@ def RepeatFunction(connection, beerStyle, brewDate):
 
 # Main
 # this is the central operator of the entire program
-# [] need to connect to the database then close
-# [] need to run the timing service
-# [] need to pull data correctly
+# [x] need to connect to the database then close
+# [x] need to run the timing service
+# [x] need to pull data correctly
 def main():
     print("Howdy, first we are going to set up the data base for you boss.")
     print("One second please.")
@@ -143,9 +139,10 @@ def main():
     connection = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    print(cursor.fetchall())
+    a = cursor.fetchall()
+    print(a)
 
-    if(cursor.fetchall() == ()):
+    if not a: #this is fucking gross.  --kyle trycatch
         print("Making table!")
 
         connection.execute ('''CREATE TABLE FERMENTATION
@@ -173,8 +170,11 @@ def main():
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
     print("Thank you. Begining study.")
 
-    WriteToDB(connection, beerStyle, brewDate)
-    sleep(60)
+    
+    #===========TESTING=======================
+
+    # WriteToDB(connection, beerStyle, brewDate)
+    # sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
     # sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
@@ -182,18 +182,20 @@ def main():
 
     # This is used to see what is up there. RAAAD
 
-    cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
-    
-    for row in cursor:
-       print ("STYLE = ", row[0])
-       print ("DATEBREWED = ", row[1])
-       print ("TIME = ", row[2])
-       print ("TEMPERATURE = ", row[3])
-       print ("O2 = ", row[4])
-       print ("CO2 = ", row[5]) 
-       print ("PH = ", row[6], "\n")
+    # cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    # 
+    # for row in cursor:
+    #    print ("STYLE = ", row[0])
+    #    print ("DATEBREWED = ", row[1])
+    #    print ("TIME = ", row[2])
+    #    print ("TEMPERATURE = ", row[3])
+    #    print ("O2 = ", row[4])
+    #    print ("CO2 = ", row[5]) 
+    #    print ("PH = ", row[6], "\n")
+# 
+    #=========================================
 
-    #RepeatFunction(connection, beerStyle, brewDate)
+    RepeatFunction(connection, beerStyle, brewDate)
 
     # When function is ended I want all to save and look back at it
     connection.close() # don't forget to close the db when you're finsihed
