@@ -19,7 +19,7 @@ from datetime import datetime
 from time import sleep
 
 import sqlite3
-import pandas as pd
+# import pandas as pd
 
 # ======================= SENSORS ========================================
 
