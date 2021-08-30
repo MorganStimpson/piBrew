@@ -22,10 +22,10 @@ Rasbian     - OS of the Raspbery Pi
         32 GB EVO+
         Case w/ fan
         8gb Ram
-        Link; https://smile.amazon.com/gp/product/B08956GVXN/ref=ppx_yo_dt_b_asin_title_o01_s00ie=UTF8&psc=1
+        Link; 
 2. Breadboard:
     Full size recommended
-    Link; https://smile.amazon.com/SunFounder-Raspberry-Breadboard-solderless-Circuit/dp/B01MQSWUGYref=sr_1_11?dchild=1&keywords=breadboard+kit+raspberry+pi&qid=1630352678&sr=8-11 
+    Link; 
 3. Wiring:
     ???
 4. Sensors:
