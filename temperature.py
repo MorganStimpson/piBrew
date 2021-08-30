@@ -2,12 +2,19 @@
 # Borrowed from
 # https://medium.com/initial-state/how-to-build-a-raspberry-pi-temperature-monitor-8c2f70acaea9
 
+# temp sensor; DS18B20 -- water proof temperature sensor
+# plug in points;   RED         -> 3.3V
+#                   Blue/Black  -> Ground
+#                   Yellow      -> Pull-Up Resistor/pin 4
+
 import os
 import glob
 import time
-from ISStreamer.Streamer import Streamer # this I am unsure on
+from ISStreamer.Streamer import Streamer # this I am unsure on -- remember pip uninstall ISStreamer if undeeded
 
-streamer = Streamer(bucket_name="Temperature Stream", bucket_key="piot_temp_stream031815", access_key="PUT_YOUR_ACCESS_KEY_HERE")
+streamer = Streamer(bucket_name="Temperature Stream", bucket_key="piot_temp_stream031815", access_key="PUT_YOUR_ACCESS_KEY_HERE") # replace this with the proper access key.
+# if the access key is correct than it should run correctly
+# the way to get the correct value is 
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
