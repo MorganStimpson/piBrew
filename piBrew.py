@@ -19,7 +19,7 @@ from datetime import datetime
 from time import sleep
 
 import sqlite3
-# import pandas as pd
+#import pandas as pd
 
 # ======================= SENSORS ========================================
 
@@ -166,6 +166,8 @@ def main():
         print("Sensors are connected correctly")
 
     # user input section
+    # on the raspbian side it fails if it does not have "" around the input
+    print("Please write your inputs within qoutes. Working on a way to fix that thank you.")
     beerStyle = input("Enter the style of your beer: ") 
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
     print("Thank you. Begining study.")
@@ -182,20 +184,20 @@ def main():
 
     # This is used to see what is up there. RAAAD
 
-    # cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
-    # 
-    # for row in cursor:
-    #    print ("STYLE = ", row[0])
-    #    print ("DATEBREWED = ", row[1])
-    #    print ("TIME = ", row[2])
-    #    print ("TEMPERATURE = ", row[3])
-    #    print ("O2 = ", row[4])
-    #    print ("CO2 = ", row[5]) 
-    #    print ("PH = ", row[6], "\n")
+    cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    
+    for row in cursor:
+       print ("STYLE = ", row[0])
+       print ("DATEBREWED = ", row[1])
+       print ("TIME = ", row[2])
+       print ("TEMPERATURE = ", row[3])
+       print ("O2 = ", row[4])
+       print ("CO2 = ", row[5]) 
+       print ("PH = ", row[6], "\n")
 # 
     #=========================================
 
-    RepeatFunction(connection, beerStyle, brewDate)
+    #RepeatFunction(connection, beerStyle, brewDate)
 
     # When function is ended I want all to save and look back at it
     connection.close() # don't forget to close the db when you're finsihed
