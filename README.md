@@ -1,6 +1,18 @@
 # piBrew - developed by Morgan Stimpson
 Use a Raspberry Pi to study the fermentation rate of wort or other fermentable liquids.
 
+## How To Run It:
+1.  Start up your Raspberry Pi
+2.  Have Tmux///// installed
+3.  From a either the Pi or another computer start an ssh TMUX client
+4.  CD to where the program sits
+5.  Start the program with "python piBrew.py"
+6.  Deattach from the TMUX session with ctrl-b d
+7.  Let the program run as long as needed
+8.  Reattach the tmux session
+9.  Ctrl-c the program data should be stored
+10. LO0k at ya data
+
 ## Goal:
 1. Produce 1 model
 2. Equip a fermentation tank with sensors
@@ -15,6 +27,7 @@ SQLite3     - Database
 MathPlotLib - Data viewing
 Pandasd     - Machine Learning / Data Processing
 Rasbian     - OS of the Raspbery Pi
+TMUX        - Run a terminal, start the program, allow for the client to leave the pi and let it run.
 
 ## Equipment List:
 1. Raspberry Pi 4B:
@@ -22,10 +35,10 @@ Rasbian     - OS of the Raspbery Pi
         32 GB EVO+
         Case w/ fan
         8gb Ram
-        Link; 
+        Link;
 2. Breadboard:
     Full size recommended
-    Link; 
+    Link;
 3. Wiring:
     ???
 4. Sensors:
@@ -53,4 +66,7 @@ Rasbian     - OS of the Raspbery Pi
 ## Resources:
 1. Temperature Reading;
     https://medium.com/initial-state/how-to-build-a-raspberry-pi-temperature-monitor-8c2f70acaea9
-2. 
+2. PH Reading;
+    https://myhydropi.com/connecting-a-ph-sensor-to-a-raspberry-pi
+3. Tmux Cheat sheet
+    https://tmuxcheatsheet.com/
