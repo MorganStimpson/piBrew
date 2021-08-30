@@ -29,26 +29,26 @@ Rasbian     - OS of the Raspbery Pi
 3. Wiring:
     ???
 4. Sensors:
-    4a. Temperature Sensor
-        Model: DS188B20 Temperature Sensor
-        Purpose: To follow the the temperature change of the fermenting wort. The temperature changeaffects all following sensors and the data that they will pull from their readings.
-    4b. O2 Sensor 
-        Model:
-        Purpose:
-        -- once most of the O2 is gone the yeast stops reproducing and begins the bulk of the    fermentation
-    4c. CO2 Sensor
-        Model:
-        Purpose: 
-        -- this will have a relation with the O2, but not sure exactly at the moment
-    4d. Time
-        Model:
-        Purpose:
-        -- This piece of information is coming from the clock on board
-    4e. PH Sensor
-        Model:
-        Purpose: 
-        -- the acidity of the liquid will kill of the yeast and prevent further fermentation
-    4f. others // I can not remember at the moment
+* *Temperature Sensor*
+* Model: DS188B20 Temperature Sensor
+* Purpose: To follow the the temperature change of the fermenting wort. The temperatur change affects all following sensors and the data that they will pull from their readings.
+* *O2 Sensor* 
+* Model:
+* Purpose:
+* Once most of the O2 is gone the yeast stops reproducing and begins the bulk of the fermentation
+* *CO2 Sensor*
+* Model:
+* Purpose: 
+* This will have a relation with the O2, but not sure exactly at the moment
+* *Time*
+* Model:
+* Purpose:
+* This piece of information is coming from the clock on board
+* *PH Sensor*
+* Model:
+* Purpose: 
+* The acidity of the liquid will kill of the yeast and prevent further fermentation
+* Others // I can not remember at the moment
 
 ## Resources:
 1. Temperature Reading;
