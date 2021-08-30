@@ -58,7 +58,6 @@ def pullPHReading():
 # Connect To Sensors
 def ConnectToSensors():
     print("")
-    print("FOOL OF A TOOK!")
     print("This has not been set up yet.")
 
     if(1 != 2):            # if unable to connect return -1 for a failure.
@@ -140,9 +139,8 @@ def main():
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     a = cursor.fetchall()
-    print(a)
 
-    if not a: #this is fucking gross.  --kyle trycatch
+    if not a: 
         print("Making table!")
 
         connection.execute ('''CREATE TABLE FERMENTATION
@@ -174,30 +172,32 @@ def main():
 
     
     #===========TESTING=======================
-
+    # 
     # WriteToDB(connection, beerStyle, brewDate)
     # sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
     # sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
-
-
+    # 
     # This is used to see what is up there. RAAAD
-
-    cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
-    
-    for row in cursor:
-       print ("STYLE = ", row[0])
-       print ("DATEBREWED = ", row[1])
-       print ("TIME = ", row[2])
-       print ("TEMPERATURE = ", row[3])
-       print ("O2 = ", row[4])
-       print ("CO2 = ", row[5]) 
-       print ("PH = ", row[6], "\n")
-# 
+    # 
+    # cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    # 
+    # for row in cursor:
+    #    print ("STYLE = ", row[0])
+    #    print ("DATEBREWED = ", row[1])
+    #    print ("TIME = ", row[2])
+    #    print ("TEMPERATURE = ", row[3])
+    #    print ("O2 = ", row[4])
+    #    print ("CO2 = ", row[5]) 
+    #    print ("PH = ", row[6], "\n")
+    # 
+    # When runnning on the pi it has u sitting in front of the data inserted. 
+    # believe it has to do with raw_input vs input issue
+    # odd
     #=========================================
 
-    #RepeatFunction(connection, beerStyle, brewDate)
+    RepeatFunction(connection, beerStyle, brewDate)
 
     # When function is ended I want all to save and look back at it
     connection.close() # don't forget to close the db when you're finsihed
