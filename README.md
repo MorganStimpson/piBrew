@@ -11,7 +11,7 @@ Using a Raspberry Pi to study the fermentation rate of wort or other fermentable
 7.  Let the program run as long as needed
 8.  Reattach the tmux session
 9.  Ctrl-c the program data should be stored
-10. LO0k at ya data
+10. Look at your data
 
 ## Goal:
 1. Produce 1 model
