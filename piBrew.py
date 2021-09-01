@@ -14,13 +14,16 @@
 
 # This is intended to study and monitor the fermentation rate of wort
 
-#import section
-from datetime import datetime
-from time import sleep
-import RPi.GPIO as GPIO
+# Thoughts:
+# Want to update from sqlite to mySQL, because I am more fimiliar
 
+# IMPORT SECTION
 import sqlite3
 #import pandas as pd
+
+from datetime import date, datetime
+from time import sleep
+# import RPi.GPIO as GPIO
 
 # ======================= SENSORS ========================================
 
@@ -39,7 +42,6 @@ def ReadFromSensors():
 
 # This is the sensor section.
 # I can not quiet read from these yet as I do not have a raspberry Pi to work with
-
 # https://medium.com/initial-state/how-to-build-a-raspberry-pi-temperature-monitor-8c2f70acaea9
 def pullTempReading():
     temp = 0
@@ -69,9 +71,6 @@ def ConnectToSensors():
     return 0
 
 # ==========================================================================
-
-
-
 # Write To DataBase
 # - Write to a sql database 
 # - fields include style, datebrewed, time, temp, o2, co2, ph, 
@@ -111,7 +110,7 @@ def RepeatFunction(connection, beerStyle, brewDate):
     print("Starting data collection") 
 
     while( datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}): 
-        print("waiting until a multiple of 5 before we write")
+        print("waiting until a multiple of 5 before we write: ", datetime.now())
         sleep(60)
     
     def timer():
