@@ -124,6 +124,36 @@ def RepeatFunction(connection, beerStyle, brewDate):
 
     timer()
 
+# Testing
+# Testing function, this is to see if the data is correctly being inserted into the database
+def testing():
+    print("Starting the testing section")
+    beerStyle = "ale"
+    brewDate = "01.23.4567"
+
+    connection = sqlite3.connect('FERMENTATION.db') # this will make a db if none are found -- if there is one skip
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+
+    # WriteToDB(connection, beerStyle, brewDate)
+    # sleep(60)
+    # WriteToDB(connection, beerStyle, brewDate)
+    # sleep(60)
+    # WriteToDB(connection, beerStyle, brewDate)
+    
+    cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    
+    for row in cursor:
+       print ("STYLE = ", row[0])
+       print ("DATEBREWED = ", row[1])
+       print ("TIME = ", row[2])
+       print ("TEMPERATURE = ", row[3])
+       print ("O2 = ", row[4])
+       print ("CO2 = ", row[5]) 
+       print ("PH = ", row[6], "\n")
+
+    connection.close()
+    
 
 
 # Main
@@ -135,8 +165,11 @@ def main():
     print("Howdy, first we are going to set up the data base for you boss.")
     print("One second please.")
 
+    #testing()
     
-    connection = sqlite3.connect('fermentation.db') # this will make a db if none are found -- if there is one skip
+    print ("testing section is over")
+
+    connection = sqlite3.connect('FERMENTATION.db') # this will make a db if none are found -- if there is one skip
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     a = cursor.fetchall()
@@ -167,36 +200,13 @@ def main():
     # user input section
     # on the raspbian side it fails if it does not have "" around the input
     print("Please write your inputs within qoutes. Working on a way to fix that thank you.")
-    beerStyle = input("Enter the style of your beer: ") 
+    tempVal = input("Enter the style of your beer: ") 
+    beerStyle = str(tempVal)
+    print(type(beerStyle))
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
+    print(type(brewDate))
     print("Thank you. Begining study.")
 
-    
-    #===========TESTING=======================
-    # 
-    # WriteToDB(connection, beerStyle, brewDate)
-    # sleep(60)
-    # WriteToDB(connection, beerStyle, brewDate)
-    # sleep(60)
-    # WriteToDB(connection, beerStyle, brewDate)
-    # 
-    # This is used to see what is up there. RAAAD
-    # 
-    # cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
-    # 
-    # for row in cursor:
-    #    print ("STYLE = ", row[0])
-    #    print ("DATEBREWED = ", row[1])
-    #    print ("TIME = ", row[2])
-    #    print ("TEMPERATURE = ", row[3])
-    #    print ("O2 = ", row[4])
-    #    print ("CO2 = ", row[5]) 
-    #    print ("PH = ", row[6], "\n")
-    # 
-    # When runnning on the pi it has u sitting in front of the data inserted. 
-    # believe it has to do with raw_input vs input issue
-    # odd
-    #=========================================
 
     RepeatFunction(connection, beerStyle, brewDate)
 
