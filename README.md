@@ -3,15 +3,21 @@ Using a Raspberry Pi to study the fermentation rate of wort or other fermentable
 
 ## How To Run It:
 1.  Start up your Raspberry Pi
-2.  Have Tmux///// installed
+2.  Have Tmux/SQLite3/? installed on your Raspberry Pi
 3.  From a either the Pi or another computer start an ssh TMUX client
 4.  CD to where the program sits
 5.  Start the program with "python piBrew.py"
 6.  Deattach from the TMUX session with ctrl-b d
 7.  Let the program run as long as needed
-8.  Reattach the tmux session
+8.  Reattach the tmux session w/ "tmux a"
 9.  Ctrl-c the program data should be stored
 10. Look at your data
+
+## Data Processing
+1. Line Graph
+2. BoxPlot
+3. Scatter PLot
+4. // Starting to think about other methods to develop
 
 ## Goal:
 1. Produce 1 model
@@ -70,3 +76,5 @@ TMUX        - Run a terminal, start the program, allow for the client to leave t
     https://myhydropi.com/connecting-a-ph-sensor-to-a-raspberry-pi
 3. Tmux Cheat sheet
     https://tmuxcheatsheet.com/
+4. Matplotlib
+    
