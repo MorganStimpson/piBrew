@@ -1,4 +1,4 @@
-# piBrew - developed by Morgan Stimpson
+# piBrew - developed by Morgan Stimpson (morgan.stimpson@hotmail.com)
 Using a Raspberry Pi to study the fermentation rate of wort or other fermentable liquids.
 
 ## How To Run It:
