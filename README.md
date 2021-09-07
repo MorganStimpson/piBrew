@@ -70,11 +70,13 @@ TMUX        - Run a terminal, start the program, allow for the client to leave t
 * Others // I can not remember at the moment
 
 ## Resources:
-1. Temperature Reading;
+1. Raspberry Pi Headless set up;
+    https://www.youtube.com/watch?v=dhY8m_Eg5iU&t=107s
+2. Temperature Reading;
     https://medium.com/initial-state/how-to-build-a-raspberry-pi-temperature-monitor-8c2f70acaea9
-2. PH Reading;
+3. PH Reading;
     https://myhydropi.com/connecting-a-ph-sensor-to-a-raspberry-pi
-3. Tmux Cheat sheet
+4. Tmux Cheat sheet
     https://tmuxcheatsheet.com/
-4. Matplotlib
+5. Matplotlib
     
