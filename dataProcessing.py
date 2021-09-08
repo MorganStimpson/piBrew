@@ -18,19 +18,30 @@ from pprint import pprint
 # Boxplot
 
 # Line Graph
-# work on this
-def lineGraph():
-    print("Starting the line graph")
+# I have it print the temperature data
+# I want to also print a single line of a different color to represent the perfect heat value
+# I want a blue line for too cold
+# I want a red line for too hot
+def lineGraph(perfect, low, high):
+    print("Starting the line graph for you boss")
 
     conn = sqlite3.connect('FERMENTATION.db')
     sql = "SELECT TEMPERATURE FROM FERMENTATION "
 
     df = pd.read_sql(sql, conn)
-    
-    print(df.head())
-    print(df.tail())
 
-    plt.plot(df)
+    # print(df.head())
+    # print(df.tail())
+
+    plt.plot(df, 'm')
+    plt.axhline(y=perfect, color='g')
+    plt.axhline(y=low, color='y')
+    plt.axhline(y=high, color='r')
+
+    plt.title("Temperature over Time")
+    plt.xlabel("Time in multiples of 5")
+    plt.ylabel("Temperature (*F)")
+    
     plt.show()
     
 
@@ -41,15 +52,12 @@ def main():
     print("What type of graph would you like to see?")
     print("Which elements would you like to observe? Time, Temp, O2, CO2, PH")
 
-    lineGraph()
+    perfect = input("What is the optimal temperature for your beer?")
 
-    # connect to db
-    connection = sqlite3.connect('FERMENTATION.db') # this will make a db if none are found -- if there is one skip
-    cursor = connection.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    perfect = int(perfect)
 
-    # disconnect from db
-    connection.close() # don't forget to close the db when you're finsihed
+
+    lineGraph(perfect, perfect - 5, perfect + 5)
 
 
 
