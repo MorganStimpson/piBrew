@@ -23,10 +23,9 @@ def countOutliers(perfect, low, high):
     belowOutOfBounds = 0
 
     df = pd.read_sql(sql, conn)
+    conn.close()
 
     for index, row in df.iterrows():
-        print(row[0])
-        print(low)
         if(row[0] <= high and row[0] >= perfect):
             aboveInBounds = aboveInBounds + 1
         if(row[0] <= perfect and row[0] >= low):
@@ -36,34 +35,22 @@ def countOutliers(perfect, low, high):
         if(row[0] < low):
             belowOutOfBounds = belowOutOfBounds + 1
 
-    conn.close()
-
-    print("There were this many readings within bounds, ", aboveInBounds + belowInBounds)
-    
-    if(aboveInBounds > belowInBounds):
-        print("The fermentation sat on the warmer side of the bounds")
-        print("This is the percentage spent in the warmer bounds, ", (aboveInBounds/ df.size ) * 100,"% ")
-    else:
-        print("The fermentation sat around the colder side of the bounds")
-        print("This is the percentage spent in the colder bounds, ", (belowInBounds/ df.size ) * 100,"% ")
-
     print("This is the percentage spent in the bounds, ", ((aboveInBounds + belowInBounds) / df.size ) * 100,"% ")
 
-    if(aboveOutOfBounds > (aboveInBounds + belowInBounds) or belowOutOfBounds > (aboveInBounds + belowInBounds)):
+    if(aboveInBounds + belowInBounds > aboveOutOfBounds + belowOutOfBounds):
+        if(aboveInBounds > belowInBounds):
+            print("The fermentation sat on the warmer side of the bounds")
+            print("This is the percentage spent in the warmer bounds, ", (aboveInBounds/ df.size ) * 100,"% ")
+        else:
+            print("The fermentation sat around the colder side of the bounds")
+            print("This is the percentage spent in the colder bounds, ", (belowInBounds/ df.size ) * 100,"% ")
+    else:
         print("Your fermentation sat outside of the goal range for the majority of the time")
-        print("There were this many readings out of bounds, ", (df.size - (aboveInBounds + belowInBounds)))
+        print("This is the percentage spent in the warmer bounds, ", ((belowOutOfBounds + aboveOutOfBounds)/ df.size ) * 100,"% ")
         if(aboveOutOfBounds > belowOutOfBounds):
             print("The fermentation process was warm for the majority of the time")
         else:
             print("The fermentation was cold for the majority of the time")
-
-    
-
-    # What is important to know about the fermentation?
-    # Did it stay hot for a while?
-    # Did it stay too cold for a while 
-    # Did it stay with in range but on the colder side // or hotter side
-
 
 # Line Graph (temperatrue v time)
 # This function takes in the ideal temp and it's buffers.
