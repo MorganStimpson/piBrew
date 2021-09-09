@@ -9,34 +9,69 @@ import sqlite3
 import pandas as pd
 import numpy as np
 
-# Scatter Plot
-
-# Boxplot
-
 # Count Outliers
-# 
+# This function counts the outliers of the data
+# This function prints out values to help the brewer get a sense of their fermentation
+#  process.
 def countOutliers(perfect, low, high):
     conn = sqlite3.connect('FERMENTATION.db')
     sql = "SELECT TEMPERATURE FROM FERMENTATION "
-    counter = 0
+    
+    aboveInBounds    = 0
+    belowInBounds    = 0
+    aboveOutOfBounds = 0
+    belowOutOfBounds = 0
 
     df = pd.read_sql(sql, conn)
 
     for index, row in df.iterrows():
-        #print(row[0])
-        if(row[0] > low and row[0] < high):
-            counter = counter + 1
+        print(row[0])
+        print(low)
+        if(row[0] <= high and row[0] >= perfect):
+            aboveInBounds = aboveInBounds + 1
+        if(row[0] <= perfect and row[0] >= low):
+            belowInBounds = belowInBounds + 1
+        if(row[0] > high):
+            aboveOutOfBounds = aboveOutOfBounds + 1
+        if(row[0] < low):
+            belowOutOfBounds = belowOutOfBounds + 1
 
     conn.close()
-    print("There were this many readings within bounds: ", counter)
-    # print("There were this many readings out of bounds, ", (df.count() - counter))
+
+    print("There were this many readings within bounds, ", aboveInBounds + belowInBounds)
+    
+    if(aboveInBounds > belowInBounds):
+        print("The fermentation sat on the warmer side of the bounds")
+        print("This is the percentage spent in the warmer bounds, ", (aboveInBounds/ df.size ) * 100,"% ")
+    else:
+        print("The fermentation sat around the colder side of the bounds")
+        print("This is the percentage spent in the colder bounds, ", (belowInBounds/ df.size ) * 100,"% ")
+
+    print("This is the percentage spent in the bounds, ", ((aboveInBounds + belowInBounds) / df.size ) * 100,"% ")
+
+    if(aboveOutOfBounds > (aboveInBounds + belowInBounds) or belowOutOfBounds > (aboveInBounds + belowInBounds)):
+        print("Your fermentation sat outside of the goal range for the majority of the time")
+        print("There were this many readings out of bounds, ", (df.size - (aboveInBounds + belowInBounds)))
+        if(aboveOutOfBounds > belowOutOfBounds):
+            print("The fermentation process was warm for the majority of the time")
+        else:
+            print("The fermentation was cold for the majority of the time")
+
+    
+
+    # What is important to know about the fermentation?
+    # Did it stay hot for a while?
+    # Did it stay too cold for a while 
+    # Did it stay with in range but on the colder side // or hotter side
 
 
-# Line Graph
-# I have it print the temperature data
-# I want to also print a single line of a different color to represent the perfect heat value
-# I want a blue line for too cold
-# I want a red line for too hot
+# Line Graph (temperatrue v time)
+# This function takes in the ideal temp and it's buffers.
+# This function then pulls the fermentation.db data
+# This function returns a graph to represent the fermentation process.
+# There is a green lien for perfect temperature
+# There is a blue line for too cold
+# There is a red line for too hot
 def lineGraph(perfect, low, high):
     print("Starting the line graph for you boss")
 
@@ -44,9 +79,6 @@ def lineGraph(perfect, low, high):
     sql = "SELECT TEMPERATURE FROM FERMENTATION "
 
     df = pd.read_sql(sql, conn)
-
-    # print(df.head())
-    # print(df.tail())
 
     plt.plot(df, 'm')
     plt.axhline(y=perfect, color='g')
@@ -59,20 +91,19 @@ def lineGraph(perfect, low, high):
     
     plt.show()
     conn.close()
-    
 
 
 # Main
 def main():
     print("Starting data processing")
-    print("What type of graph would you like to see?")
-    print("Which elements would you like to observe? Time, Temp, O2, CO2, PH")
 
     perfect = input("What is the optimal temperature for your beer? ")
+    bound   = input("How far are the bounds that you would like (most common is 5 to 10)? ")
     perfect = int(perfect)
+    bound   = int(bound)
 
-    countOutliers(perfect, perfect - 5, perfect + 5)
-    lineGraph(perfect, perfect - 5, perfect + 5)
+    countOutliers(perfect, perfect - bound, perfect + bound)
+    lineGraph(perfect, perfect - bound, perfect + bound)
 
 
 
