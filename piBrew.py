@@ -104,7 +104,7 @@ def ConnectToSensors():
 # - Write to a sql database 
 # - fields include style, datebrewed, time, temp, o2, co2, ph, 
 #   having a herculomitor reading would be rad to
-def WriteToDB(connection, beerStyle, brewDate):
+def WriteToDB(connection, batchNum, beerStyle, brewDate):
 
     temperature, o2, co2, ph = ReadFromSensors()
 
@@ -117,11 +117,11 @@ def WriteToDB(connection, beerStyle, brewDate):
 
     sql =       """
                 INSERT INTO FERMENTATION
-                (STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH) \
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                (BATCHNUM, STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH) \
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """
 
-    params = (beerStyle, brewDate, currentTime, temperature, o2, co2, ph)
+    params = (batchNum, beerStyle, brewDate, currentTime, temperature, o2, co2, ph)
     connection.execute (sql, params)
     connection.commit ()
     
@@ -134,7 +134,7 @@ def WriteToDB(connection, beerStyle, brewDate):
 # this will constantly but every 5 minutes it will kick in to write.
 # Once it is ran it will sleep for 1 minute and 1 second 
 #    so that it does not write 2 times on the same minute
-def RepeatFunction(connection, beerStyle, brewDate):
+def RepeatFunction(connection, batchNum, beerStyle, brewDate):
     print("")
     print("Starting data collection") 
 
@@ -145,11 +145,11 @@ def RepeatFunction(connection, beerStyle, brewDate):
     def timer():
         print("")
         print("We are up and running")
-        WriteToDB(connection, beerStyle, brewDate)
+        WriteToDB(connection, batchNum, beerStyle, brewDate)
         print("-Now sleeping")
         sleep(61)
         print("-Now going to repeat")
-        RepeatFunction(connection, beerStyle, brewDate)
+        RepeatFunction(connection, batchNum, beerStyle, brewDate)
 
     timer()
 
@@ -195,10 +195,8 @@ def main():
     print("One second please.")
 
     #testing()
-    
-    print ("testing section is over")
 
-    connection = sqlite3.connect('FERMENTATION.db') # this will make a db if none are found -- if there is one skip
+    connection = sqlite3.connect('FERMENTATION.db')
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     a = cursor.fetchall()
@@ -207,40 +205,36 @@ def main():
         print("Making table!")
 
         connection.execute ('''CREATE TABLE FERMENTATION
-                (   STYLE           STR,
+                (BATCH         INT  PRIMARY KEY     NOT NULL,   
+                STYLE           STR,
                 DATEBREWED      STR,
-                TIME            TIME PRIMARY KEY     NOT NULL,
+                TIME            TIME PRIMARY KEY    NOT NULL,
                 TEMPERATURE     INT,
                 O2              INT,
                 CO2             INT,
                 PH              INT);''')
 
-    
-
     print("Connected to database correctly.")
 
-    # TODO: Take in user input to reattempt
     if(ConnectToSensors() == -1):
         print("Sensors failed to connect.")
         print("You should restart the program.")
     else:
         print("Sensors are connected correctly")
 
-    # user input section
-    # on the raspbian side it fails if it does not have "" around the input
     print("Please write your inputs within qoutes. Working on a way to fix that thank you.")
-    tempVal = input("Enter the style of your beer: ") 
+    batchNum = input("Please enter the batch number of this beer: ")
+    batchNum = int(batchNum)
+    tempVal = input("Please enter the style of your beer: ") 
     beerStyle = str(tempVal)
     print(type(beerStyle))
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
     print(type(brewDate))
     print("Thank you. Begining study.")
 
+    RepeatFunction(connection, batchNum, beerStyle, brewDate)
 
-    RepeatFunction(connection, beerStyle, brewDate)
-
-    # When function is ended I want all to save and look back at it
-    connection.close() # don't forget to close the db when you're finsihed
+    connection.close()
 
 
 if __name__ == '__main__':
