@@ -207,7 +207,7 @@ def main():
                 (BATCH         INT  PRIMARY KEY     NOT NULL,   
                 STYLE           STR,
                 DATEBREWED      STR,
-                TIME            TIME PRIMARY KEY    NOT NULL,
+                TIME            TIME,
                 TEMPERATURE     INT,
                 O2              INT,
                 CO2             INT,
