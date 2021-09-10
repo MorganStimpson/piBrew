@@ -12,10 +12,9 @@
 #
 ##################################################################
 
-# This is intended to study and monitor the fermentation rate of wort
-
-# Thoughts:
-# Want to update from sqlite to mySQL, because I am more fimiliar
+# GOAL: This function is intended to monitor the fermentation rate of beer.
+# This software runs on a raspberry pi attached to a temperature sensor
+# It will pull data and place it into a database for future use.
 
 # IMPORT SECTION
 from glob import glob
@@ -23,11 +22,10 @@ import sqlite3
 import os
 import glob
 import time
-#import pandas as pd
 
 from datetime import date, datetime
 from time import sleep
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 # GLOBALS
 os.system('modprobe w1-gpio')
@@ -100,6 +98,7 @@ def ConnectToSensors():
     return 0
 
 # ==========================================================================
+
 # Write To DataBase
 # - Write to a sql database 
 # - fields include style, datebrewed, time, temp, o2, co2, ph, 
@@ -160,7 +159,7 @@ def testing():
     beerStyle = "ale"
     brewDate = "01.23.4567"
 
-    connection = sqlite3.connect('FERMENTATION.db') # this will make a db if none are found -- if there is one skip
+    connection = sqlite3.connect('FERMENTATION.db')
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 
