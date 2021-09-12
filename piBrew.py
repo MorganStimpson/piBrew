@@ -116,7 +116,7 @@ def WriteToDB(connection, batchNum, beerStyle, brewDate):
 
     sql =       """
                 INSERT INTO FERMENTATION
-                (BATCHNUM, STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH) \
+                (BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH) \
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """
 
@@ -169,16 +169,17 @@ def testing():
     # sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
     
-    cursor = connection.execute("SELECT STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    cursor = connection.execute("SELECT BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
     
     for row in cursor:
-       print ("STYLE = ", row[0])
-       print ("DATEBREWED = ", row[1])
-       print ("TIME = ", row[2])
-       print ("TEMPERATURE = ", row[3])
-       print ("O2 = ", row[4])
-       print ("CO2 = ", row[5]) 
-       print ("PH = ", row[6], "\n")
+        print ("BATCH = ",          row[0])
+        print ("STYLE = ",          row[1])
+        print ("DATEBREWED = ",     row[2])
+        print ("TIME = ",           row[3])
+        print ("TEMPERATURE = ",    row[4])
+        print ("O2 = ",             row[5])
+        print ("CO2 = ",            row[6]) 
+        print ("PH = ",             row[7], "\n")
 
     connection.close()
     
@@ -204,7 +205,7 @@ def main():
         print("Making table!")
 
         connection.execute ('''CREATE TABLE FERMENTATION
-                (BATCH         INT  PRIMARY KEY     NOT NULL,   
+                (BATCH          INT  PRIMARY KEY     NOT NULL,   
                 STYLE           STR,
                 DATEBREWED      STR,
                 TIME            TIME,
