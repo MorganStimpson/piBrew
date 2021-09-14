@@ -205,10 +205,10 @@ def main():
         print("Making table!")
 
         connection.execute ('''CREATE TABLE FERMENTATION
-                (BATCH          INT  PRIMARY KEY     NOT NULL,   
+                (BATCH          INT,   
                 STYLE           STR,
                 DATEBREWED      STR,
-                TIME            TIME,
+                TIME            TIME    PRIMARY KEY NOT NULL,
                 TEMPERATURE     INT,
                 O2              INT,
                 CO2             INT,
@@ -227,13 +227,11 @@ def main():
     batchNum = int(batchNum)
     tempVal = input("Please enter the style of your beer: ") 
     beerStyle = str(tempVal)
-    print(type(beerStyle))
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
-    print(type(brewDate))
+    
     print("Thank you. Begining study.")
-
     RepeatFunction(connection, batchNum, beerStyle, brewDate)
-
+    
     connection.close()
 
 
