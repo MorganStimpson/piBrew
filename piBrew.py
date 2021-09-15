@@ -23,7 +23,7 @@ import os
 import glob
 import time
 
-from datetime import date, datetime
+from datetime import datetime
 from time import sleep
 import RPi.GPIO as GPIO
 
@@ -44,13 +44,10 @@ def ReadFromSensors():
     print("-- pulling data from sensors.")
 
     temperature = pullTempReading()
-    o2          = pullO2Reading()
-    co2         = pullCO2Reading()
-    ph          = pullPHReading()
 
-    return temperature, o2, co2, ph
+    return temperature
 
-# ==== Tempearture Reading ===
+# ==== Tempearture Reading ===6
 def read_temp_raw():
     f = open(device_file, 'r')
     lines = f.readlines()
@@ -70,32 +67,8 @@ def pullTempReading():
         return temp_f
 # ===============
 
-# This is the sensor section.
-# I can not quiet read from these yet as I do not have a raspberry Pi to work with
-# https://medium.com/initial-state/how-to-build-a-raspberry-pi-temperature-monitor-8c2f70acaea9
-
-def pullO2Reading():
-    o2 = 1
-    return o2
-
-def pullCO2Reading():
-    co2 = 2
-    return co2
-
-def pullPHReading():
-    ph = 3
-    return ph
-
 # Connect To Sensors
-# If we are unable to connect to the sensors then return -1
-#  If we are able to connect return 0
-def ConnectToSensors():
-    print("")
-    print("This has not been set up yet.")
 
-    if(1 != 2):
-        return -1
-    return 0
 
 # ==========================================================================
 
@@ -105,7 +78,7 @@ def ConnectToSensors():
 #   having a herculomitor reading would be rad to
 def WriteToDB(connection, batchNum, beerStyle, brewDate):
 
-    temperature, o2, co2, ph = ReadFromSensors()
+    temperature = ReadFromSensors()
 
     print("")
     print("- Sucessfully read from sensors.")
@@ -116,11 +89,11 @@ def WriteToDB(connection, batchNum, beerStyle, brewDate):
 
     sql =       """
                 INSERT INTO FERMENTATION
-                (BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH) \
+                (BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE) \
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """
 
-    params = (batchNum, beerStyle, brewDate, currentTime, temperature, o2, co2, ph)
+    params = (batchNum, beerStyle, brewDate, currentTime, temperature)
     connection.execute (sql, params)
     connection.commit ()
     
@@ -169,7 +142,7 @@ def testing():
     # sleep(60)
     # WriteToDB(connection, beerStyle, brewDate)
     
-    cursor = connection.execute("SELECT BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE, O2, CO2, PH from FERMENTATION")
+    cursor = connection.execute("SELECT BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE from FERMENTATION")
     
     for row in cursor:
         print ("BATCH = ",          row[0])
@@ -177,9 +150,6 @@ def testing():
         print ("DATEBREWED = ",     row[2])
         print ("TIME = ",           row[3])
         print ("TEMPERATURE = ",    row[4])
-        print ("O2 = ",             row[5])
-        print ("CO2 = ",            row[6]) 
-        print ("PH = ",             row[7], "\n")
 
     connection.close()
     
@@ -209,18 +179,9 @@ def main():
                 STYLE           STR,
                 DATEBREWED      STR,
                 TIME            TIME    PRIMARY KEY NOT NULL,
-                TEMPERATURE     INT,
-                O2              INT,
-                CO2             INT,
-                PH              INT);''')
+                TEMPERATURE     INT);''')
 
     print("Connected to database correctly.")
-
-    if(ConnectToSensors() == -1):
-        print("Sensors failed to connect.")
-        print("You should restart the program.")
-    else:
-        print("Sensors are connected correctly")
 
     print("Please write your inputs within qoutes. Working on a way to fix that thank you.")
     batchNum = input("Please enter the batch number of this beer: ")
