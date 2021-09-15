@@ -90,7 +90,7 @@ def WriteToDB(connection, batchNum, beerStyle, brewDate):
     sql =       """
                 INSERT INTO FERMENTATION
                 (BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE) \
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
                 """
 
     params = (batchNum, beerStyle, brewDate, currentTime, temperature)
