@@ -114,7 +114,7 @@ def RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate):
         print("waiting until a multiple of 5 before we write: ", datetime.now())
         sleep(60)
     
-    def timer():
+    def timer(rowID):
         print("")
         print("We are up and running")
         WriteToDB(connection, rowID, batchNum, beerStyle, brewDate)
@@ -124,7 +124,7 @@ def RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate):
         rowID = rowID + 1
         RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate)
 
-    timer()
+    timer(rowID)
 
 # Testing
 # Testing function, this is to see if the data is correctly being inserted into the database
@@ -192,10 +192,9 @@ def main():
     tempVal = input("Please enter the style of your beer: ") 
     beerStyle = str(tempVal)
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
-    rowID = 0
     
     print("Thank you. Begining study.")
-    RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate)
+    RepeatFunction(connection, 0, batchNum, beerStyle, brewDate)
     
     connection.close()
 
