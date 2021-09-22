@@ -26,7 +26,7 @@ import time
 from datetime import datetime
 from time import sleep
 import RPi.GPIO as GPIO
-
+ 
 # GLOBALS
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -40,20 +40,20 @@ device_file = device_folder + '/w1_slave'
 # Read From Sensors
 # Here we pull the data from the sensors
 def ReadFromSensors():
-    
-    print("-- pulling data from sensors.")
-
-    temperature = pullTempReading()
-
-    return temperature
-
-# ==== Tempearture Reading ===6
+     
+     print("-- pulling data from sensors.")
+ 
+     temperature = pullTempReading()
+ 
+     return temperature
+ 
+#  ==== Tempearture Reading ===6
 def read_temp_raw():
     f = open(device_file, 'r')
     lines = f.readlines()
     f.close()
     return lines
-
+ 
 def pullTempReading():
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES':
@@ -76,7 +76,7 @@ def pullTempReading():
 # - Write to a sql database 
 # - fields include style, datebrewed, time, temp, o2, co2, ph, 
 #   having a herculomitor reading would be rad to
-def WriteToDB(connection, batchNum, beerStyle, brewDate):
+def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate):
 
     temperature = ReadFromSensors()
 
@@ -89,11 +89,11 @@ def WriteToDB(connection, batchNum, beerStyle, brewDate):
 
     sql =       """
                 INSERT INTO FERMENTATION
-                (BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE) \
-                VALUES (?, ?, ?, ?, ?)
+                (ROWID, BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE) \
+                VALUES (?, ?, ?, ?, ?, ?)
                 """
 
-    params = (batchNum, beerStyle, brewDate, currentTime, temperature)
+    params = (rowID, batchNum, beerStyle, brewDate, currentTime, temperature)
     connection.execute (sql, params)
     connection.commit ()
     
@@ -106,7 +106,7 @@ def WriteToDB(connection, batchNum, beerStyle, brewDate):
 # this will constantly but every 5 minutes it will kick in to write.
 # Once it is ran it will sleep for 1 minute and 1 second 
 #    so that it does not write 2 times on the same minute
-def RepeatFunction(connection, batchNum, beerStyle, brewDate):
+def RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate):
     print("")
     print("Starting data collection") 
 
@@ -117,11 +117,12 @@ def RepeatFunction(connection, batchNum, beerStyle, brewDate):
     def timer():
         print("")
         print("We are up and running")
-        WriteToDB(connection, batchNum, beerStyle, brewDate)
+        WriteToDB(connection, rowID, batchNum, beerStyle, brewDate)
         print("-Now sleeping")
         sleep(61)
         print("-Now going to repeat")
-        RepeatFunction(connection, batchNum, beerStyle, brewDate)
+        rowID = rowID + 1
+        RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate)
 
     timer()
 
@@ -145,11 +146,12 @@ def testing():
     cursor = connection.execute("SELECT BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE from FERMENTATION")
     
     for row in cursor:
-        print ("BATCH = ",          row[0])
-        print ("STYLE = ",          row[1])
-        print ("DATEBREWED = ",     row[2])
-        print ("TIME = ",           row[3])
-        print ("TEMPERATURE = ",    row[4])
+        print ("ROWID = ",          row[0])
+        print ("BATCH = ",          row[1])
+        print ("STYLE = ",          row[2])
+        print ("DATEBREWED = ",     row[3])
+        print ("TIME = ",           row[4])
+        print ("TEMPERATURE = ",    row[5])
 
     connection.close()
     
@@ -166,7 +168,7 @@ def main():
 
     #testing()
 
-    connection = sqlite3.connect('FERMENTATION.db')
+    connection = sqlite3.connect('./FERMENTATION.db')
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     a = cursor.fetchall()
@@ -175,10 +177,11 @@ def main():
         print("Making table!")
 
         connection.execute ('''CREATE TABLE FERMENTATION
-                (BATCH          INT,   
+                (ROWID          INT     PRIMARY KEY NOT NULL,
+                BATCH           INT,
                 STYLE           STR,
                 DATEBREWED      STR,
-                TIME            TIME    PRIMARY KEY NOT NULL,
+                TIME            TIME,
                 TEMPERATURE     INT);''')
 
     print("Connected to database correctly.")
@@ -189,9 +192,10 @@ def main():
     tempVal = input("Please enter the style of your beer: ") 
     beerStyle = str(tempVal)
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
+    rowID = 0
     
     print("Thank you. Begining study.")
-    RepeatFunction(connection, batchNum, beerStyle, brewDate)
+    RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate)
     
     connection.close()
 
