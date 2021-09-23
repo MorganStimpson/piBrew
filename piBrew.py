@@ -81,19 +81,22 @@ def pullTempReading():
 
 # Connect To Sensors
 
-def tempLight(temperature):
-    print("beginning light work")
+def tempLight(temperature, fermentationTemp):
+    
+    upperTempThreshold = fermentationTemp + 10
+    lowerTempThreshold = fermentationTemp - 10
+    
     GPIO.output(RLEDPin, False)
     GPIO.output(GLEDPin, False)
     GPIO.output(BLEDPin, False)
     
-    if temperature > 75:
+    if temperature > upperTempThreshold:
         GPIO.output (RLEDPin, True)
     
-    if temperature < 75 and temperature > 55:
+    if temperature < upperTempThreshold and temperature > lowerTempThreshold:
         GPIO.output (GLEDPin, True)
     
-    if temperature < 55:
+    if temperature < lowerTempThreshold:
         GPIO.output (BLEDPin, True)
 
 # ==========================================================================
@@ -102,10 +105,10 @@ def tempLight(temperature):
 # - Write to a sql database 
 # - fields include style, datebrewed, time, temp, o2, co2, ph, 
 #   having a herculomitor reading would be rad to
-def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate):
+def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp):
 
     temperature = ReadFromSensors()
-    tempLight(temperature)
+    tempLight(temperature, fermentationTemp)
 
     print("")
     print("- Sucessfully read from sensors.")
@@ -133,7 +136,7 @@ def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate):
 # this will constantly but every 5 minutes it will kick in to write.
 # Once it is ran it will sleep for 1 minute and 1 second 
 #    so that it does not write 2 times on the same minute
-def RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate):
+def RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp):
     print("")
     print("Starting data collection") 
 
@@ -144,12 +147,12 @@ def RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate):
     def timer(rowID):
         print("")
         print("We are up and running")
-        WriteToDB(connection, rowID, batchNum, beerStyle, brewDate)
+        WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp)
         print("-Now sleeping")
         sleep(61)
         print("-Now going to repeat")
         rowID = rowID + 1
-        RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate)
+        RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp)
 
     timer(rowID)
 
@@ -219,9 +222,12 @@ def main():
     tempVal = input("Please enter the style of your beer: ") 
     beerStyle = str(tempVal)
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
-    
+    fermentationTemp = input("Please enter your ideal fermentation temperature.")
+    fermentationTemp = int(fermentationTemp)
+    print("The bounds will be + - 10 *F.")
+
     print("Thank you. Begining study.")
-    RepeatFunction(connection, 0, batchNum, beerStyle, brewDate)
+    RepeatFunction(connection, 0, batchNum, beerStyle, brewDate, fermentationTemp)
     
     connection.close()
 
