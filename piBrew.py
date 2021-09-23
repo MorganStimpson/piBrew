@@ -27,6 +27,8 @@ from datetime import datetime
 from time import sleep
 import RPi.GPIO as GPIO
  
+GPIO.setmode(GPIO.BCM)
+
 # GLOBALS
 # # Therm
 os.system('modprobe w1-gpio')
