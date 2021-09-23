@@ -28,8 +28,18 @@ from time import sleep
 import RPi.GPIO as GPIO
  
 # GLOBALS
+# # Therm
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
+# # Lights
+RLEDPin = 17
+GLEDPin = 27
+BLEDPin = 22
+
+# Setup the pin the LED is connect to
+GPIO.setup(RLEDPin, GPIO.OUT)
+GPIO.setup(GLEDPin, GPIO.OUT)
+GPIO.setup(BLEDPin, GPIO.OUT)
 
 base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
@@ -69,6 +79,20 @@ def pullTempReading():
 
 # Connect To Sensors
 
+def tempLight(temperature):
+    print("beginning light work")
+    GPIO.output(RLEDPin, False)
+    GPIO.output(GLEDPin, False)
+    GPIO.output(BLEDPin, False)
+    
+    if temperature > 75:
+        GPIO.output (RLEDPin, True)
+    
+    if temperature < 75 and temperature > 55:
+        GPIO.output (GLEDPin, True)
+    
+    if temperature < 55:
+        GPIO.output (BLEDPin, True)
 
 # ==========================================================================
 
@@ -79,6 +103,7 @@ def pullTempReading():
 def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate):
 
     temperature = ReadFromSensors()
+    tempLight(temperature)
 
     print("")
     print("- Sucessfully read from sensors.")
