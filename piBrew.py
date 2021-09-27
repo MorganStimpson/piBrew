@@ -136,25 +136,23 @@ def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp
 # this will constantly but every 5 minutes it will kick in to write.
 # Once it is ran it will sleep for 1 minute and 1 second 
 #    so that it does not write 2 times on the same minute
-def RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp):
+def RepeatFunction(connection, rowID, fermentationTime, batchNum, beerStyle, brewDate, fermentationTemp):
     print("")
     print("Starting data collection") 
 
-    while( datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}): 
-        print("waiting until a multiple of 5 before we write: ", datetime.now())
-        sleep(60)
-    
-    def timer(rowID):
-        print("")
-        print("We are up and running")
-        WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp)
-        print("-Now sleeping")
-        sleep(61)
-        print("-Now going to repeat")
-        rowID = rowID + 1
-        RepeatFunction(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp)
-
-    timer(rowID)
+    while (rowID <= fermentationTime * 2016): # 2016 is the amount of times 5 minutes occur in a week
+        
+        if ( datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}): 
+            print("waiting until a multiple of 5 before we write: ", datetime.now())
+            sleep(60)
+        else: 
+            print("")
+            print("We are up and running")
+            WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp)
+            print("-Now sleeping")
+            sleep(61)
+            print("-Now going to repeat")
+            rowID = rowID + 1
 
 # Testing
 # Testing function, this is to see if the data is correctly being inserted into the database
@@ -225,9 +223,11 @@ def main():
     fermentationTemp = input("Please enter your ideal fermentation temperature.")
     fermentationTemp = int(fermentationTemp)
     print("The bounds will be + - 10 *F.")
+    fermentationTime = input("Please enter for how long you want to monitor your fermentation.")
+    fermentationTime = int(fermentationTime)
 
     print("Thank you. Begining study.")
-    RepeatFunction(connection, 0, batchNum, beerStyle, brewDate, fermentationTemp)
+    RepeatFunction(connection, 0, batchNum, fermentationTime, beerStyle, brewDate, fermentationTemp)
     
     connection.close()
 
