@@ -54,7 +54,6 @@ device_file = device_folder + '/w1_slave'
 def ReadFromSensors():
      
      print("-- pulling data from sensors.")
- 
      temperature = pullTempReading()
  
      return temperature
@@ -110,7 +109,6 @@ def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp
     temperature = ReadFromSensors()
     tempLight(temperature, fermentationTemp)
 
-    print("")
     print("- Sucessfully read from sensors.")
     print("- trying to write")
 
@@ -143,15 +141,16 @@ def RepeatFunction(connection, rowID, fermentationTime, batchNum, beerStyle, bre
     while (rowID <= fermentationTime * 2016): # 2016 is the amount of times 5 minutes occur in a week
         
         if ( datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}): 
+            print("")
             print("waiting until a multiple of 5 before we write: ", datetime.now())
             sleep(60)
         else: 
             print("")
             print("We are up and running")
             WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp)
-            print("-Now sleeping")
+            print("Now sleeping")
             sleep(61)
-            print("-Now going to repeat")
+            print("Now going to repeat")
             rowID = rowID + 1
 
 # Testing
