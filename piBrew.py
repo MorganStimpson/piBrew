@@ -1,5 +1,5 @@
 # Morgan Stimpson (morgan.stimpson@hotmail.com)
-# piBrew 
+# piBrew // https://github.com/MorganStimpson/piBrew/
 
 # GOAL: This program is intended to monitor the fermentation rate of wort into beer.
 # This program runs on a raspberry pi attached to a temperature sensor.
