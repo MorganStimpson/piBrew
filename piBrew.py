@@ -1,19 +1,8 @@
 # Morgan Stimpson (morgan.stimpson@hotmail.com)
 # piBrew 
-##################################################################
-#
-#                        ######                       
-#               #####  # #     # #####  ###### #    # 
-#               #    # # #     # #    # #      #    # 
-#               #    # # ######  #    # #####  #    # 
-#               #####  # #     # #####  #      # ## # 
-#               #      # #     # #   #  #      ##  ## 
-#               #      # ######  #    # ###### #    # 
-#
-##################################################################
 
-# GOAL: This function is intended to monitor the fermentation rate of beer.
-# This software runs on a raspberry pi attached to a temperature sensor
+# GOAL: This program is intended to monitor the fermentation rate of wort into beer.
+# This program runs on a raspberry pi attached to a temperature sensor.
 # It will pull data and place it into a database for future use.
 
 # IMPORT SECTION
@@ -50,7 +39,7 @@ device_file = device_folder + '/w1_slave'
 # ======================= SENSORS ========================================
 
 # Read From Sensors
-# Here we pull the data from the sensors
+# - Here we pull the data from the sensors
 def ReadFromSensors():
      
      print("-- pulling data from sensors.")
@@ -58,13 +47,15 @@ def ReadFromSensors():
  
      return temperature
  
-#  ==== Tempearture Reading ===6
+#  ==== Tempearture Reading ===+
+# Read Temperature Raw
 def read_temp_raw():
     f = open(device_file, 'r')
     lines = f.readlines()
     f.close()
     return lines
  
+# Pull Temperature Reading
 def pullTempReading():
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES':
@@ -78,8 +69,8 @@ def pullTempReading():
         return temp_f
 # ===============
 
-# Connect To Sensors
-
+# Temperature Light
+# - This function shows what is going on for the lighting of the breadboard
 def tempLight(temperature, fermentationTemp):
     
     upperTempThreshold = fermentationTemp + 10
@@ -97,13 +88,11 @@ def tempLight(temperature, fermentationTemp):
     
     if temperature < lowerTempThreshold:
         GPIO.output (BLEDPin, True)
-
+        
 # ==========================================================================
 
 # Write To DataBase
-# - Write to a sql database 
-# - fields include style, datebrewed, time, temp, o2, co2, ph, 
-#   having a herculomitor reading would be rad to
+# - Write to a sql database
 def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp):
 
     temperature = ReadFromSensors()
@@ -127,12 +116,10 @@ def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp
     
     print("- Written to database")
 
-
-
-# Repeat Function -- come up with a better name
-# this function is what will be running once everything is started up.
-# this will constantly but every 5 minutes it will kick in to write.
-# Once it is ran it will sleep for 1 minute and 1 second 
+# Repeat Function
+# - This function is what will be running once everything is started up.
+# - This will constantly but every 5 minutes it will kick in to write.
+# - Once it is ran it will sleep for 1 minute and 1 second 
 #    so that it does not write 2 times on the same minute
 def RepeatFunction(connection, rowID, fermentationTime, batchNum, beerStyle, brewDate, fermentationTemp):
     print("")
@@ -153,47 +140,11 @@ def RepeatFunction(connection, rowID, fermentationTime, batchNum, beerStyle, bre
             print("Now going to repeat")
             rowID = rowID + 1
 
-# Testing
-# Testing function, this is to see if the data is correctly being inserted into the database
-def testing():
-    print("Starting the testing section")
-    beerStyle = "ale"
-    brewDate = "01.23.4567"
-
-    connection = sqlite3.connect('FERMENTATION.db')
-    cursor = connection.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-
-    # WriteToDB(connection, beerStyle, brewDate)
-    # sleep(60)
-    # WriteToDB(connection, beerStyle, brewDate)
-    # sleep(60)
-    # WriteToDB(connection, beerStyle, brewDate)
-    
-    cursor = connection.execute("SELECT BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE from FERMENTATION")
-    
-    for row in cursor:
-        print ("ROWID = ",          row[0])
-        print ("BATCH = ",          row[1])
-        print ("STYLE = ",          row[2])
-        print ("DATEBREWED = ",     row[3])
-        print ("TIME = ",           row[4])
-        print ("TEMPERATURE = ",    row[5])
-
-    connection.close()
-    
-
-
 # Main
-# this is the central operator of the entire program
-# [x] need to connect to the database then close
-# [x] need to run the timing service
-# [x] need to pull data correctly
+# This is the central operator of the entire program
 def main():
     print("Howdy, first we are going to set up the data base for you boss.")
     print("One second please.")
-
-    #testing()
 
     connection = sqlite3.connect('./FERMENTATION.db')
     cursor = connection.cursor()
@@ -222,7 +173,7 @@ def main():
     fermentationTemp = input("Please enter your ideal fermentation temperature.")
     fermentationTemp = int(fermentationTemp)
     print("The bounds will be + - 10 *F.")
-    fermentationTime = input("Please enter for how long you want to monitor your fermentation.")
+    fermentationTime = input("Please enter for how long you want to monitor your fermentation, in weeks.")
     fermentationTime = int(fermentationTime)
 
     print("Thank you. Begining study.")
