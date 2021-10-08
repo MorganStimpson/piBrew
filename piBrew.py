@@ -88,7 +88,7 @@ def tempLight(temperature, fermentationTemp):
     
     if temperature < lowerTempThreshold:
         GPIO.output (BLEDPin, True)
-        
+
 # ==========================================================================
 
 # Write To DataBase
@@ -125,7 +125,9 @@ def RepeatFunction(connection, rowID, fermentationTime, batchNum, beerStyle, bre
     print("")
     print("Starting data collection") 
 
-    while (rowID <= fermentationTime * 2016): # 2016 is the amount of times 5 minutes occur in a week
+    stopTime = fermentationTime * 2
+
+    while (rowID <= stopTime): # 2016 is the amount of times 5 minutes occur in a week
         
         if ( datetime.now().minute not in {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55}): 
             print("")
