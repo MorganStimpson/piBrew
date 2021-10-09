@@ -125,7 +125,7 @@ def RepeatFunction(connection, rowID, fermentationTime, batchNum, beerStyle, bre
     print("")
     print("Starting data collection") 
 
-    stopTime = fermentationTime * 2
+    stopTime = fermentationTime * 2016
 
     while (rowID <= stopTime): # 2016 is the amount of times 5 minutes occur in a week
         
