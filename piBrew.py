@@ -41,10 +41,8 @@ device_file = device_folder + '/w1_slave'
 # Read From Sensors
 # - Here we pull the data from the sensors
 def ReadFromSensors():
-     
      print("-- pulling data from sensors.")
      temperature = pullTempReading()
- 
      return temperature
  
 #  ==== Tempearture Reading ===+
@@ -67,14 +65,13 @@ def pullTempReading():
         temp_c = float(temp_string) / 1000.0
         temp_f = ((temp_c * 9) / 5) + 32
         return temp_f
-# ===============
 
 # Temperature Light
 # - This function shows what is going on for the lighting of the breadboard
 def tempLight(temperature, fermentationTemp):
     
-    upperTempThreshold = fermentationTemp + 10
-    lowerTempThreshold = fermentationTemp - 10
+    upperTempThreshold = fermentationTemp + 7
+    lowerTempThreshold = fermentationTemp - 7
     
     GPIO.output(RLEDPin, False)
     GPIO.output(GLEDPin, False)
@@ -104,11 +101,11 @@ def WriteToDB(connection, rowID, batchNum, beerStyle, brewDate, fermentationTemp
     now = datetime.now()
     currentTime = now.strftime("%H:%M:%S") 
 
-    sql =       """
-                INSERT INTO FERMENTATION
-                (ROWID, BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE) \
-                VALUES (?, ?, ?, ?, ?, ?)
-                """
+    sql =   """
+            INSERT INTO FERMENTATION
+            (ROWID, BATCH, STYLE, DATEBREWED, TIME, TEMPERATURE) \
+            VALUES (?, ?, ?, ?, ?, ?)
+            """
 
     params = (rowID, batchNum, beerStyle, brewDate, currentTime, temperature)
     connection.execute (sql, params)
@@ -145,8 +142,7 @@ def RepeatFunction(connection, rowID, fermentationTime, batchNum, beerStyle, bre
 # Main
 # This is the central operator of the entire program
 def main():
-    print("Howdy, first we are going to set up the data base for you boss.")
-    print("One second please.")
+    print("Checking to see if FERMENTATION.db exists.")
 
     connection = sqlite3.connect('./FERMENTATION.db')
     cursor = connection.cursor()
@@ -154,7 +150,7 @@ def main():
     a = cursor.fetchall()
 
     if not a: 
-        print("Making table!")
+        print("FERMENTATION.db was not found, making a new table.")
 
         connection.execute ('''CREATE TABLE FERMENTATION
                 (ROWID          INT     PRIMARY KEY NOT NULL,
@@ -164,18 +160,17 @@ def main():
                 TIME            TIME,
                 TEMPERATURE     INT);''')
 
-    print("Connected to database correctly.")
-
-    print("Please write your inputs within qoutes. Working on a way to fix that thank you.")
+    print("Please write your inputs within qoutes.")
     batchNum = input("Please enter the batch number of this beer: ")
-    batchNum = int(batchNum)
-    tempVal = input("Please enter the style of your beer: ") 
-    beerStyle = str(tempVal)
+    beerStyle = input("Please enter the style of your beer: ") 
     brewDate  = input("Please enter date of brew in the format of --.--.---- ")
     fermentationTemp = input("Please enter your ideal fermentation temperature.")
-    fermentationTemp = int(fermentationTemp)
-    print("The bounds will be + - 10 *F.")
+    print("The bounds will be + - 7 *F.")
     fermentationTime = input("Please enter for how long you want to monitor your fermentation, in weeks.")
+
+    batchNum = int(batchNum)
+    beerStyle = str(beerStyle)
+    fermentationTemp = int(fermentationTemp)
     fermentationTime = int(fermentationTime)
 
     print("Thank you. Begining study.")
