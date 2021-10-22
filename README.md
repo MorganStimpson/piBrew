@@ -23,8 +23,12 @@ Using a Raspberry Pi to study the fermentation rate of wort or other fermentable
 4. -Constantly pull data and store in a SQLite3 database-
 5. -Train on the model to create a generic model.-
 6. -Use the data to predict for the next batch or future batches-
-7. Create a server to host data
-8. Graph data on the server 
+7. Adjust bounds of lighting alg.
+8. Figure out how to not need to make a new db but only a table
+9. Figure out how to get the last rowID if the pi crashes and needs to restart
+10. Use the last rowId to continue the fermentation db
+11. Create a server to host data
+12. Graph data on the server 
 
 ## Technologies Used:
 Python      - Programming Language to conduct everything within
